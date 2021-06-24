@@ -383,7 +383,7 @@ $*SC014::
     if SC014_extended {
         if SC014_shifted {
             SendInput {Blind}{Shift Up}
-            Send, ±
+            Send {Raw}±
             SendInput {Blind}{Shift Down}
         }
         else
@@ -397,7 +397,7 @@ $*SC014 up::
     SetKeyDelay -1
     if SC014_extended {
         if SC014_shifted
-            return
+            __noop()
         else
             SendInput {Blind}{SC008 up}
     }
@@ -1324,3 +1324,7 @@ $ScrollLock::
         SetScrollLockState, Off
 return
 
+
+__noop() {
+    ;; Do nothing.
+}

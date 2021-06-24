@@ -183,6 +183,18 @@ class ScriptCreator:
             shift_extended - Key to be sent when extend and shift are down.
             comment - Comment to add to the AHK script before the keybinding.
         
+        A key to send can be one of the following:
+            str - does what you'd expect, sends the key by its name. Example: 'Pgup'
+            Tuple[List[str], str] - send a key with modifiers. Example: (['Ctrl', 'Shift'], 'Numpad1')
+            RawInput - Sends raw text. 
+            AhkFunction - For more custom/complex things.
+            None - Do nothing.
+            ... - essentially means "fill it in":
+                normal is ... -> normal = key
+                shifted is ... -> shifted = Shift + normal
+                extended is ... -> extended = normal
+                shift_extended is ... -> shift_extended = Shift + extended
+
         TODO - currently only the first extend layer is supported.
         """
 
@@ -337,7 +349,10 @@ return
             self._noop_function_used = True
             return f'{ScriptCreator.NOOP_FUNCTION_NAME}()'
         if isinstance(mapping, RawInput):
-            return f'Send, {mapping.value}' if key_down else 'return'
+            if key_down:
+                return f'Send {{Raw}}{mapping.value}'
+            self._noop_function_used = True
+            return f'{ScriptCreator.NOOP_FUNCTION_NAME}()'
         if isinstance(mapping, AhkFunction):
             return f'{mapping.name}{"_down" if key_down else "_up"}()'
         return f'SendInput {{Blind}}{_key_to_str(mapping, key_down)}'
